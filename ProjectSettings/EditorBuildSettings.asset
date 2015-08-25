@@ -8,4 +8,4 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Widgets.unity
   - enabled: 1
-    path: Assets/Scenes/Menu 3D.unity
+    path: Assets/Menu 3D.unity
