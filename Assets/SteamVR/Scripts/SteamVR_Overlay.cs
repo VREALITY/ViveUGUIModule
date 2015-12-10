@@ -17,16 +17,17 @@ public class SteamVR_Overlay : MonoBehaviour
 	public float scale = 3.0f;			// size of overlay view
 	public float distance = 1.25f;		// distance from surface
 	public float alpha = 1.0f;			// opacity 0..1
-	public float gamma = 1.0f;
 
 	public Vector4 uvOffset = new Vector4(0, 0, 1, 1);
 	public Vector2 mouseScale = new Vector2(1, 1);
+	public Vector2 curvedRange = new Vector2(1, 2);
 
 	public VROverlayInputMethod inputMethod = VROverlayInputMethod.None;
 
 	static public SteamVR_Overlay instance { get; private set; }
 
-	private string key { get { return "unity:" + Application.companyName + "." + Application.productName; } }
+	static public string key { get { return "unity:" + Application.companyName + "." + Application.productName; } }
+
 	private ulong handle = OpenVR.k_ulOverlayHandleInvalid;
 
 	void OnEnable()
@@ -35,7 +36,7 @@ public class SteamVR_Overlay : MonoBehaviour
 		if (vr != null && vr.overlay != null)
 		{
 			var error = vr.overlay.CreateOverlay(key, gameObject.name, ref handle);
-			if (error != VROverlayError.None)
+			if (error != EVROverlayError.None)
 			{
 				Debug.Log(vr.overlay.GetOverlayErrorNameFromEnum(error));
 				enabled = false;
@@ -50,9 +51,12 @@ public class SteamVR_Overlay : MonoBehaviour
 	{
 		if (handle != OpenVR.k_ulOverlayHandleInvalid)
 		{
-			var vr = SteamVR.instance;
-			if (vr != null && vr.overlay != null)
-				vr.overlay.DestroyOverlay(handle);
+			if (SteamVR.active)
+			{
+				var vr = SteamVR.instance;
+				if (vr.overlay != null)
+					vr.overlay.DestroyOverlay(handle);
+			}
 
 			handle = OpenVR.k_ulOverlayHandleInvalid;
 		}
@@ -65,16 +69,21 @@ public class SteamVR_Overlay : MonoBehaviour
 		if (texture != null)
 		{
 			var error = vr.overlay.ShowOverlay(handle);
-			if (error == VROverlayError.InvalidHandle || error == VROverlayError.UnknownOverlay)
+			if (error == EVROverlayError.InvalidHandle || error == EVROverlayError.UnknownOverlay)
 			{
-				if (vr.overlay.FindOverlay(key, ref handle) != VROverlayError.None)
+				if (vr.overlay.FindOverlay(key, ref handle) != EVROverlayError.None)
 					return;
 			}
 
-			vr.overlay.SetOverlayTexture(handle, vr.graphicsAPI, texture.GetNativeTexturePtr());
+			var tex = new Texture_t();
+			tex.handle = texture.GetNativeTexturePtr();
+			tex.eType = vr.graphicsAPI;
+			tex.eColorSpace = EColorSpace.Auto;
+            vr.overlay.SetOverlayTexture(handle, ref tex);
+
 			vr.overlay.SetOverlayAlpha(handle, alpha);
-			vr.overlay.SetOverlayGamma(handle, gamma);
 			vr.overlay.SetOverlayWidthInMeters(handle, scale);
+			vr.overlay.SetOverlayAutoCurveDistanceRangeInMeters(handle, curvedRange.x, curvedRange.y);
 
 			var textureBounds = new VRTextureBounds_t();
 			textureBounds.uMin = (0 + uvOffset.x) * uvOffset.z;

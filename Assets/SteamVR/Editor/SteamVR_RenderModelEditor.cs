@@ -13,7 +13,7 @@ using Valve.VR;
 [CustomEditor(typeof(SteamVR_RenderModel)), CanEditMultipleObjects]
 public class SteamVR_RenderModelEditor : Editor
 {
-	SerializedProperty script, index, modelOverride;
+	SerializedProperty script, index, modelOverride, verbose, createComponents, updateDynamically;
 
 	static string[] renderModelNames;
 	int renderModelIndex;
@@ -23,6 +23,9 @@ public class SteamVR_RenderModelEditor : Editor
 		script = serializedObject.FindProperty("m_Script");
 		index = serializedObject.FindProperty("index");
 		modelOverride = serializedObject.FindProperty("modelOverride");
+		verbose = serializedObject.FindProperty("verbose");
+		createComponents = serializedObject.FindProperty("createComponents");
+		updateDynamically = serializedObject.FindProperty("updateDynamically");
 
 		// Load render model names if necessary.
 		if (renderModelNames == null)
@@ -49,39 +52,25 @@ public class SteamVR_RenderModelEditor : Editor
 		var results = new List<string>();
 		results.Add("None");
 
-		var error = HmdError.None;
-		if (!SteamVR.active)
+		using (var holder = new SteamVR_RenderModel.RenderModelInterfaceHolder())
 		{
-			OpenVR.Init(ref error);
-			if (error != HmdError.None)
-				return results.ToArray();
+			var renderModels = holder.instance;
+			if (renderModels != null)
+			{
+				uint count = renderModels.GetRenderModelCount();
+				for (uint i = 0; i < count; i++)
+				{
+					var buffer = new StringBuilder();
+					var requiredSize = renderModels.GetRenderModelName(i, buffer, 0);
+					if (requiredSize == 0)
+						continue;
+
+					buffer.EnsureCapacity((int)requiredSize);
+					renderModels.GetRenderModelName(i, buffer, requiredSize);
+					results.Add(buffer.ToString());
+				}
+			}
 		}
-
-		var pRenderModels = OpenVR.GetGenericInterface(OpenVR.IVRRenderModels_Version, ref error);
-		if (pRenderModels == System.IntPtr.Zero || error != HmdError.None)
-		{
-			if (!SteamVR.active)
-				OpenVR.Shutdown();
-			return results.ToArray();
-		}
-
-		var renderModels = new CVRRenderModels(pRenderModels);
-
-		uint count = renderModels.GetRenderModelCount();
-		for (uint i = 0; i < count; i++)
-		{
-			var buffer = new StringBuilder();
-			var requiredSize = renderModels.GetRenderModelName(i, buffer, 0);
-			if (requiredSize == 0)
-				continue;
-
-			buffer.EnsureCapacity((int)requiredSize);
-			renderModels.GetRenderModelName(i, buffer, requiredSize);
-			results.Add(buffer.ToString());
-		}
-
-		if (!SteamVR.active)
-			OpenVR.Shutdown();
 
 		return results.ToArray();
 	}
@@ -103,6 +92,10 @@ public class SteamVR_RenderModelEditor : Editor
 			modelOverride.stringValue = (selected > 0) ? renderModelNames[selected] : "";
 		}
 		GUILayout.EndHorizontal();
+
+		EditorGUILayout.PropertyField(verbose);
+		EditorGUILayout.PropertyField(createComponents);
+		EditorGUILayout.PropertyField(updateDynamically);
 
 		serializedObject.ApplyModifiedProperties();
 	}

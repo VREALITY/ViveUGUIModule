@@ -99,31 +99,31 @@ public class SteamVR_Frustum : MonoBehaviour
 		if (connected)
 		{
 			var vr = SteamVR.instance;
-			if (vr.hmd.GetTrackedDeviceClass((uint)i) == Valve.VR.TrackedDeviceClass.TrackingReference)
+			if (vr.hmd.GetTrackedDeviceClass((uint)i) == Valve.VR.ETrackedDeviceClass.TrackingReference)
 			{
-				var error = Valve.VR.TrackedPropertyError.TrackedProp_Success;
-				var result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_FieldOfViewLeftDegrees_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				var error = Valve.VR.ETrackedPropertyError.TrackedProp_Success;
+				var result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_FieldOfViewLeftDegrees_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					fovLeft = result;
 
-				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_FieldOfViewRightDegrees_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_FieldOfViewRightDegrees_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					fovRight = result;
 
-				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_FieldOfViewTopDegrees_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_FieldOfViewTopDegrees_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					fovTop = result;
 
-				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_FieldOfViewBottomDegrees_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_FieldOfViewBottomDegrees_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					fovBottom = result;
 
-				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_TrackingRangeMinimumMeters_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_TrackingRangeMinimumMeters_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					nearZ = result;
 
-				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.TrackedDeviceProperty.Prop_TrackingRangeMaximumMeters_Float, ref error);
-				if (error == Valve.VR.TrackedPropertyError.TrackedProp_Success)
+				result = vr.hmd.GetFloatTrackedDeviceProperty((uint)i, Valve.VR.ETrackedDeviceProperty.Prop_TrackingRangeMaximumMeters_Float, ref error);
+				if (error == Valve.VR.ETrackedPropertyError.TrackedProp_Success)
 					farZ = result;
 
 				UpdateModel();

@@ -7,25 +7,19 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(Camera))]
 public class SteamVR_CameraFlip : MonoBehaviour
 {
 	static Material blitMaterial;
-
-	new Camera camera;
 
 	void OnEnable()
 	{
 		if (blitMaterial == null)
 			blitMaterial = new Material(Shader.Find("Custom/SteamVR_BlitFlip"));
-
-		camera = GetComponent<Camera>();
 	}
 
 	void OnRenderImage(RenderTexture src, RenderTexture dest)
 	{
-		var pass = (camera.hdr && QualitySettings.activeColorSpace == ColorSpace.Gamma) ? 1 : 0;
-		Graphics.Blit(src, dest, blitMaterial, pass);
+		Graphics.Blit(src, dest, blitMaterial);
 	}
 }
 

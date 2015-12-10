@@ -34,16 +34,21 @@ public class SteamVR_Controller
 		public Device(uint i) { index = i; }
 		public uint index { get; private set; }
 
+		public bool valid { get; private set; }
 		public bool connected { get { Update(); return pose.bDeviceIsConnected; } }
 		public bool hasTracking { get { Update(); return pose.bPoseIsValid; } }
 
-		public bool outOfRange { get { Update(); return pose.eTrackingResult == HmdTrackingResult.TrackingResult_Running_OutOfRange || pose.eTrackingResult == HmdTrackingResult.TrackingResult_Calibrating_OutOfRange; } }
-		public bool calibrating { get { Update(); return pose.eTrackingResult == HmdTrackingResult.TrackingResult_Calibrating_InProgress || pose.eTrackingResult == HmdTrackingResult.TrackingResult_Calibrating_OutOfRange; } }
-		public bool uninitialized { get { Update(); return pose.eTrackingResult == HmdTrackingResult.TrackingResult_Uninitialized; } }
+		public bool outOfRange { get { Update(); return pose.eTrackingResult == ETrackingResult.Running_OutOfRange || pose.eTrackingResult == ETrackingResult.Calibrating_OutOfRange; } }
+		public bool calibrating { get { Update(); return pose.eTrackingResult == ETrackingResult.Calibrating_InProgress || pose.eTrackingResult == ETrackingResult.Calibrating_OutOfRange; } }
+		public bool uninitialized { get { Update(); return pose.eTrackingResult == ETrackingResult.Uninitialized; } }
 
 		public SteamVR_Utils.RigidTransform transform { get { Update(); return new SteamVR_Utils.RigidTransform(pose.mDeviceToAbsoluteTracking); } }
 		public Vector3 velocity { get { Update(); return new Vector3(pose.vVelocity.v[0], pose.vVelocity.v[1], -pose.vVelocity.v[2]); } }
 		public Vector3 angularVelocity { get { Update(); return new Vector3(-pose.vAngularVelocity.v[0], -pose.vAngularVelocity.v[1], pose.vAngularVelocity.v[2]); } }
+
+		public VRControllerState_t GetState() { Update(); return state; }
+		public VRControllerState_t GetPrevState() { Update(); return prevState; }
+		public TrackedDevicePose_t GetPose() { Update(); return pose; }
 
 		VRControllerState_t state, prevState;
 		TrackedDevicePose_t pose;
@@ -56,7 +61,7 @@ public class SteamVR_Controller
 				prevState = state;
 
 				var vr = SteamVR.instance;
-				vr.hmd.GetControllerStateWithPose(SteamVR_Render.instance.trackingSpace, index, ref state, ref pose);
+				valid = vr.hmd.GetControllerStateWithPose(SteamVR_Render.instance.trackingSpace, index, ref state, ref pose);
 
 				UpdateHairTrigger();
 			}
@@ -152,7 +157,7 @@ public class SteamVR_Controller
 		FarthestRight,
 	}
 	public static int GetDeviceIndex(DeviceRelation relation,
-		TrackedDeviceClass deviceClass = TrackedDeviceClass.Controller,
+		ETrackedDeviceClass deviceClass = ETrackedDeviceClass.Controller,
 		int relativeTo = (int)OpenVR.k_unTrackedDeviceIndex_Hmd) // use -1 for absolute tracking space
 	{
 		var invXform = ((uint)relativeTo < OpenVR.k_unMaxTrackedDeviceCount) ?

@@ -17,6 +17,7 @@ public class SteamVR_Settings : EditorWindow
 	const string useRecommended = "Use recommended ({0})";
 	const string currentValue = " (current = {0})";
 
+	const string showUnitySplashScreen = "Show Unity Splashscreen";
 	const string defaultIsFullScreen = "Default is Fullscreen";
 	const string defaultScreenSize = "Default Screen Size";
 	const string runInBackground = "Run In Background";
@@ -25,11 +26,12 @@ public class SteamVR_Settings : EditorWindow
 	const string fullscreenMode = "D3D11 Fullscreen Mode";
 	const string visibleInBackground = "Visible In Background";
 	const string renderingPath = "Rendering Path";
-	const string colorSpace = "Color Space";
+//	const string colorSpace = "Color Space";
 	const string stereoscopicRendering = "Stereoscopic Rendering";
-#if UNITY_5_1
+#if !UNITY_5_0
 	const string virtualRealitySupported = "Virtual Reality Support";
 #endif
+	const bool recommended_ShowUnitySplashScreen = false;
 	const bool recommended_DefaultIsFullScreen = false;
 	const int recommended_DefaultScreenWidth = 1024;
 	const int recommended_DefaultScreenHeight = 768;
@@ -39,9 +41,9 @@ public class SteamVR_Settings : EditorWindow
 	const D3D11FullscreenMode recommended_FullscreenMode = D3D11FullscreenMode.FullscreenWindow;
 	const bool recommended_VisibleInBackground = true;
 	const RenderingPath recommended_RenderPath = RenderingPath.Forward;
-	const ColorSpace recommended_ColorSpace = ColorSpace.Linear;
+//	const ColorSpace recommended_ColorSpace = ColorSpace.Linear;
 	const bool recommended_StereoscopicRendering = false;
-#if UNITY_5_1
+#if !UNITY_5_0
 	const bool recommended_VirtualRealitySupported = false;
 #endif
 	static SteamVR_Settings window;
@@ -55,6 +57,8 @@ public class SteamVR_Settings : EditorWindow
 	static void Update()
 	{
 		bool show =
+			(!EditorPrefs.HasKey(ignore + showUnitySplashScreen) &&
+				PlayerSettings.showUnitySplashScreen != recommended_ShowUnitySplashScreen) ||
 			(!EditorPrefs.HasKey(ignore + defaultIsFullScreen) &&
 				PlayerSettings.defaultIsFullScreen != recommended_DefaultIsFullScreen) ||
 			(!EditorPrefs.HasKey(ignore + defaultScreenSize) &&
@@ -72,11 +76,11 @@ public class SteamVR_Settings : EditorWindow
 				PlayerSettings.visibleInBackground != recommended_VisibleInBackground) ||
 			(!EditorPrefs.HasKey(ignore + renderingPath) &&
 				PlayerSettings.renderingPath != recommended_RenderPath) ||
-			(!EditorPrefs.HasKey(ignore + colorSpace) &&
-				PlayerSettings.colorSpace != recommended_ColorSpace) ||
+//			(!EditorPrefs.HasKey(ignore + colorSpace) &&
+//				PlayerSettings.colorSpace != recommended_ColorSpace) ||
 			(!EditorPrefs.HasKey(ignore + stereoscopicRendering) &&
 				PlayerSettings.stereoscopic3D != recommended_StereoscopicRendering) ||
-#if UNITY_5_1
+#if !UNITY_5_0
 			(!EditorPrefs.HasKey(ignore + virtualRealitySupported) &&
 				PlayerSettings.virtualRealitySupported != recommended_VirtualRealitySupported) ||
 #endif
@@ -119,9 +123,37 @@ public class SteamVR_Settings : EditorWindow
 
 		scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
+		int numItems = 0;
+
+		if (!EditorPrefs.HasKey(ignore + showUnitySplashScreen) &&
+			PlayerSettings.showUnitySplashScreen != recommended_ShowUnitySplashScreen)
+		{
+			++numItems;
+
+			GUILayout.Label(showUnitySplashScreen + string.Format(currentValue, PlayerSettings.showUnitySplashScreen));
+
+			GUILayout.BeginHorizontal();
+
+			if (GUILayout.Button(string.Format(useRecommended, recommended_ShowUnitySplashScreen)))
+			{
+				PlayerSettings.showUnitySplashScreen = recommended_ShowUnitySplashScreen;
+			}
+
+			GUILayout.FlexibleSpace();
+
+			if (GUILayout.Button("Ignore"))
+			{
+				EditorPrefs.SetBool(ignore + showUnitySplashScreen, true);
+			}
+
+			GUILayout.EndHorizontal();
+		}
+
 		if (!EditorPrefs.HasKey(ignore + defaultIsFullScreen) &&
 			PlayerSettings.defaultIsFullScreen != recommended_DefaultIsFullScreen)
 		{
+			++numItems;
+
 			GUILayout.Label(defaultIsFullScreen + string.Format(currentValue, PlayerSettings.defaultIsFullScreen));
 
 			GUILayout.BeginHorizontal();
@@ -145,6 +177,8 @@ public class SteamVR_Settings : EditorWindow
 			(PlayerSettings.defaultScreenWidth != recommended_DefaultScreenWidth ||
 			PlayerSettings.defaultScreenHeight != recommended_DefaultScreenHeight))
 		{
+			++numItems;
+
 			GUILayout.Label(defaultScreenSize + string.Format(" ({0}x{1})", PlayerSettings.defaultScreenWidth, PlayerSettings.defaultScreenHeight));
 
 			GUILayout.BeginHorizontal();
@@ -168,6 +202,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + runInBackground) &&
 			PlayerSettings.runInBackground != recommended_RunInBackground)
 		{
+			++numItems;
+
 			GUILayout.Label(runInBackground + string.Format(currentValue, PlayerSettings.runInBackground));
 
 			GUILayout.BeginHorizontal();
@@ -190,6 +226,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + displayResolutionDialog) &&
 			PlayerSettings.displayResolutionDialog != recommended_DisplayResolutionDialog)
 		{
+			++numItems;
+
 			GUILayout.Label(displayResolutionDialog + string.Format(currentValue, PlayerSettings.displayResolutionDialog));
 
 			GUILayout.BeginHorizontal();
@@ -212,6 +250,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + resizableWindow) &&
 			PlayerSettings.resizableWindow != recommended_ResizableWindow)
 		{
+			++numItems;
+
 			GUILayout.Label(resizableWindow + string.Format(currentValue, PlayerSettings.resizableWindow));
 
 			GUILayout.BeginHorizontal();
@@ -234,6 +274,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + fullscreenMode) &&
 			PlayerSettings.d3d11FullscreenMode != recommended_FullscreenMode)
 		{
+			++numItems;
+
 			GUILayout.Label(fullscreenMode + string.Format(currentValue, PlayerSettings.d3d11FullscreenMode));
 
 			GUILayout.BeginHorizontal();
@@ -256,6 +298,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + visibleInBackground) &&
 			PlayerSettings.visibleInBackground != recommended_VisibleInBackground)
 		{
+			++numItems;
+
 			GUILayout.Label(visibleInBackground + string.Format(currentValue, PlayerSettings.visibleInBackground));
 
 			GUILayout.BeginHorizontal();
@@ -278,6 +322,8 @@ public class SteamVR_Settings : EditorWindow
 		if (!EditorPrefs.HasKey(ignore + renderingPath) &&
 			PlayerSettings.renderingPath != recommended_RenderPath)
 		{
+			++numItems;
+
 			GUILayout.Label(renderingPath + string.Format(currentValue, PlayerSettings.renderingPath));
 
 			GUILayout.BeginHorizontal();
@@ -296,10 +342,12 @@ public class SteamVR_Settings : EditorWindow
 
 			GUILayout.EndHorizontal();
 		}
-
+/*
 		if (!EditorPrefs.HasKey(ignore + colorSpace) &&
 			PlayerSettings.colorSpace != recommended_ColorSpace)
 		{
+			++numItems;
+
 			GUILayout.Label(colorSpace + string.Format(currentValue, PlayerSettings.colorSpace));
 
 			GUILayout.BeginHorizontal();
@@ -318,10 +366,12 @@ public class SteamVR_Settings : EditorWindow
 
 			GUILayout.EndHorizontal();
 		}
-
+*/
 		if (!EditorPrefs.HasKey(ignore + stereoscopicRendering) &&
 			PlayerSettings.stereoscopic3D != recommended_StereoscopicRendering)
 		{
+			++numItems;
+
 			GUILayout.Label(stereoscopicRendering + string.Format(currentValue, PlayerSettings.stereoscopic3D));
 
 			GUILayout.BeginHorizontal();
@@ -340,10 +390,12 @@ public class SteamVR_Settings : EditorWindow
 
 			GUILayout.EndHorizontal();
 		}
-#if UNITY_5_1
+#if !UNITY_5_0
 		if (!EditorPrefs.HasKey(ignore + virtualRealitySupported) &&
 			PlayerSettings.virtualRealitySupported != recommended_VirtualRealitySupported)
 		{
+			++numItems;
+
 			GUILayout.Label(virtualRealitySupported + string.Format(currentValue, PlayerSettings.virtualRealitySupported));
 
 			GUILayout.BeginHorizontal();
@@ -369,6 +421,7 @@ public class SteamVR_Settings : EditorWindow
 
 		if (GUILayout.Button("Clear All Ignores"))
 		{
+			EditorPrefs.DeleteKey(ignore + showUnitySplashScreen);
 			EditorPrefs.DeleteKey(ignore + defaultIsFullScreen);
 			EditorPrefs.DeleteKey(ignore + defaultScreenSize);
 			EditorPrefs.DeleteKey(ignore + runInBackground);
@@ -377,9 +430,9 @@ public class SteamVR_Settings : EditorWindow
 			EditorPrefs.DeleteKey(ignore + fullscreenMode);
 			EditorPrefs.DeleteKey(ignore + visibleInBackground);
 			EditorPrefs.DeleteKey(ignore + renderingPath);
-			EditorPrefs.DeleteKey(ignore + colorSpace);
+//			EditorPrefs.DeleteKey(ignore + colorSpace);
 			EditorPrefs.DeleteKey(ignore + stereoscopicRendering);
-#if UNITY_5_1
+#if !UNITY_5_0
 			EditorPrefs.DeleteKey(ignore + virtualRealitySupported);
 #endif
 		}
@@ -392,75 +445,86 @@ public class SteamVR_Settings : EditorWindow
 
 		GUILayout.BeginHorizontal();
 
-		if (GUILayout.Button("Accept All"))
+		if (numItems > 0)
 		{
-			// Only set those that have not been explicitly ignored.
-			if (!EditorPrefs.HasKey(ignore + defaultIsFullScreen))
-				PlayerSettings.defaultIsFullScreen = recommended_DefaultIsFullScreen;
-			if (!EditorPrefs.HasKey(ignore + defaultScreenSize))
+			if (GUILayout.Button("Accept All"))
 			{
-				PlayerSettings.defaultScreenWidth = recommended_DefaultScreenWidth;
-				PlayerSettings.defaultScreenHeight = recommended_DefaultScreenHeight;
-			}
-			if (!EditorPrefs.HasKey(ignore + runInBackground))
-				PlayerSettings.runInBackground = recommended_RunInBackground;
-			if (!EditorPrefs.HasKey(ignore + displayResolutionDialog))
-				PlayerSettings.displayResolutionDialog = recommended_DisplayResolutionDialog;
-			if (!EditorPrefs.HasKey(ignore + resizableWindow))
-				PlayerSettings.resizableWindow = recommended_ResizableWindow;
-			if (!EditorPrefs.HasKey(ignore + fullscreenMode))
-				PlayerSettings.d3d11FullscreenMode = recommended_FullscreenMode;
-			if (!EditorPrefs.HasKey(ignore + visibleInBackground))
-				PlayerSettings.visibleInBackground = recommended_VisibleInBackground;
-			if (!EditorPrefs.HasKey(ignore + renderingPath))
-				PlayerSettings.renderingPath = recommended_RenderPath;
-			if (!EditorPrefs.HasKey(ignore + colorSpace))
-				PlayerSettings.colorSpace = recommended_ColorSpace;
-			if (!EditorPrefs.HasKey(ignore + stereoscopicRendering))
-				PlayerSettings.stereoscopic3D = recommended_StereoscopicRendering;
-#if UNITY_5_1
-			if (!EditorPrefs.HasKey(ignore + virtualRealitySupported))
-				PlayerSettings.virtualRealitySupported = recommended_VirtualRealitySupported;
-#endif
-			EditorUtility.DisplayDialog("Accept All", "You made the right choice!", "Ok");
-
-			Close();
-		}
-
-		if (GUILayout.Button("Ignore All"))
-		{
-			if (EditorUtility.DisplayDialog("Ignore All", "Are you sure?", "Yes, Ignore All", "Cancel"))
-			{
-				// Only ignore those that do not currently match our recommended settings.
-				if (PlayerSettings.defaultIsFullScreen != recommended_DefaultIsFullScreen)
-					EditorPrefs.SetBool(ignore + defaultIsFullScreen, true);
-				if (PlayerSettings.defaultScreenWidth != recommended_DefaultScreenWidth ||
-					PlayerSettings.defaultScreenHeight != recommended_DefaultScreenHeight)
+				// Only set those that have not been explicitly ignored.
+				if (!EditorPrefs.HasKey(ignore + showUnitySplashScreen))
+					PlayerSettings.showUnitySplashScreen = recommended_ShowUnitySplashScreen;
+				if (!EditorPrefs.HasKey(ignore + defaultIsFullScreen))
+					PlayerSettings.defaultIsFullScreen = recommended_DefaultIsFullScreen;
+				if (!EditorPrefs.HasKey(ignore + defaultScreenSize))
 				{
-					EditorPrefs.SetBool(ignore + defaultScreenSize, true);
+					PlayerSettings.defaultScreenWidth = recommended_DefaultScreenWidth;
+					PlayerSettings.defaultScreenHeight = recommended_DefaultScreenHeight;
 				}
-				if (PlayerSettings.runInBackground != recommended_RunInBackground)
-					EditorPrefs.SetBool(ignore + runInBackground, true);
-				if (PlayerSettings.displayResolutionDialog != recommended_DisplayResolutionDialog)
-					EditorPrefs.SetBool(ignore + displayResolutionDialog, true);
-				if (PlayerSettings.resizableWindow != recommended_ResizableWindow)
-					EditorPrefs.SetBool(ignore + resizableWindow, true);
-				if (PlayerSettings.d3d11FullscreenMode != recommended_FullscreenMode)
-					EditorPrefs.SetBool(ignore + fullscreenMode, true);
-				if (PlayerSettings.visibleInBackground != recommended_VisibleInBackground)
-					EditorPrefs.SetBool(ignore + visibleInBackground, true);
-				if (PlayerSettings.renderingPath != recommended_RenderPath)
-					EditorPrefs.SetBool(ignore + renderingPath, true);
-				if (PlayerSettings.colorSpace != recommended_ColorSpace)
-					EditorPrefs.SetBool(ignore + colorSpace, true);
-				if (PlayerSettings.stereoscopic3D != recommended_StereoscopicRendering)
-					EditorPrefs.SetBool(ignore + stereoscopicRendering, true);
-#if UNITY_5_1
-				if (PlayerSettings.virtualRealitySupported != recommended_VirtualRealitySupported)
-					EditorPrefs.SetBool(ignore + virtualRealitySupported, true);
+				if (!EditorPrefs.HasKey(ignore + runInBackground))
+					PlayerSettings.runInBackground = recommended_RunInBackground;
+				if (!EditorPrefs.HasKey(ignore + displayResolutionDialog))
+					PlayerSettings.displayResolutionDialog = recommended_DisplayResolutionDialog;
+				if (!EditorPrefs.HasKey(ignore + resizableWindow))
+					PlayerSettings.resizableWindow = recommended_ResizableWindow;
+				if (!EditorPrefs.HasKey(ignore + fullscreenMode))
+					PlayerSettings.d3d11FullscreenMode = recommended_FullscreenMode;
+				if (!EditorPrefs.HasKey(ignore + visibleInBackground))
+					PlayerSettings.visibleInBackground = recommended_VisibleInBackground;
+				if (!EditorPrefs.HasKey(ignore + renderingPath))
+					PlayerSettings.renderingPath = recommended_RenderPath;
+//				if (!EditorPrefs.HasKey(ignore + colorSpace))
+//					PlayerSettings.colorSpace = recommended_ColorSpace;
+				if (!EditorPrefs.HasKey(ignore + stereoscopicRendering))
+					PlayerSettings.stereoscopic3D = recommended_StereoscopicRendering;
+#if !UNITY_5_0
+				if (!EditorPrefs.HasKey(ignore + virtualRealitySupported))
+					PlayerSettings.virtualRealitySupported = recommended_VirtualRealitySupported;
 #endif
+				EditorUtility.DisplayDialog("Accept All", "You made the right choice!", "Ok");
+
 				Close();
 			}
+
+			if (GUILayout.Button("Ignore All"))
+			{
+				if (EditorUtility.DisplayDialog("Ignore All", "Are you sure?", "Yes, Ignore All", "Cancel"))
+				{
+					// Only ignore those that do not currently match our recommended settings.
+					if (PlayerSettings.showUnitySplashScreen != recommended_ShowUnitySplashScreen)
+						EditorPrefs.SetBool(ignore + showUnitySplashScreen, true);
+					if (PlayerSettings.defaultIsFullScreen != recommended_DefaultIsFullScreen)
+						EditorPrefs.SetBool(ignore + defaultIsFullScreen, true);
+					if (PlayerSettings.defaultScreenWidth != recommended_DefaultScreenWidth ||
+						PlayerSettings.defaultScreenHeight != recommended_DefaultScreenHeight)
+					{
+						EditorPrefs.SetBool(ignore + defaultScreenSize, true);
+					}
+					if (PlayerSettings.runInBackground != recommended_RunInBackground)
+						EditorPrefs.SetBool(ignore + runInBackground, true);
+					if (PlayerSettings.displayResolutionDialog != recommended_DisplayResolutionDialog)
+						EditorPrefs.SetBool(ignore + displayResolutionDialog, true);
+					if (PlayerSettings.resizableWindow != recommended_ResizableWindow)
+						EditorPrefs.SetBool(ignore + resizableWindow, true);
+					if (PlayerSettings.d3d11FullscreenMode != recommended_FullscreenMode)
+						EditorPrefs.SetBool(ignore + fullscreenMode, true);
+					if (PlayerSettings.visibleInBackground != recommended_VisibleInBackground)
+						EditorPrefs.SetBool(ignore + visibleInBackground, true);
+					if (PlayerSettings.renderingPath != recommended_RenderPath)
+						EditorPrefs.SetBool(ignore + renderingPath, true);
+//					if (PlayerSettings.colorSpace != recommended_ColorSpace)
+//						EditorPrefs.SetBool(ignore + colorSpace, true);
+					if (PlayerSettings.stereoscopic3D != recommended_StereoscopicRendering)
+						EditorPrefs.SetBool(ignore + stereoscopicRendering, true);
+#if !UNITY_5_0
+					if (PlayerSettings.virtualRealitySupported != recommended_VirtualRealitySupported)
+						EditorPrefs.SetBool(ignore + virtualRealitySupported, true);
+#endif
+					Close();
+				}
+			}
+		}
+		else if (GUILayout.Button("Close"))
+		{
+			Close();
 		}
 
 		GUILayout.EndHorizontal();

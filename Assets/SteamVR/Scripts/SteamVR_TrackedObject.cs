@@ -11,6 +11,7 @@ public class SteamVR_TrackedObject : MonoBehaviour
 {
 	public enum EIndex
 	{
+		None = -1,
 		Hmd = (int)OpenVR.k_unTrackedDeviceIndex_Hmd,
 		Device1,
 		Device2,
@@ -35,6 +36,9 @@ public class SteamVR_TrackedObject : MonoBehaviour
 
 	private void OnNewPoses(params object[] args)
 	{
+		if (index == EIndex.None)
+			return;
+
 		var i = (int)index;
 
         isValid = false;

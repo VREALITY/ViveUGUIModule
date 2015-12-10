@@ -23,7 +23,7 @@
 		return tex2D(_MainTex, i.tex);
 	}
 
-	float4 frag_hdr(v2f i) : COLOR {
+	float4 frag_linear(v2f i) : COLOR {
 		return pow(tex2D(_MainTex, i.tex), 1.0 / 2.2);
 	}
 
@@ -45,7 +45,7 @@
 
 			CGPROGRAM
 			#pragma vertex vert
-			#pragma fragment frag_hdr
+			#pragma fragment frag_linear
 			ENDCG
 		}
 	}

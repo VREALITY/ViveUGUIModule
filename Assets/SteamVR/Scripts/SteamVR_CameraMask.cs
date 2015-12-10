@@ -31,7 +31,7 @@ public class SteamVR_CameraMask : MonoBehaviour
 		mr.reflectionProbeUsage = ReflectionProbeUsage.Off;
 	}
 
-	public void Set(SteamVR vr, Valve.VR.Hmd_Eye eye)
+	public void Set(SteamVR vr, Valve.VR.EVREye eye)
 	{
 		int i = (int)eye;
 		if (hiddenAreaMeshes[i] == null)

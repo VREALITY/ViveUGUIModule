@@ -101,7 +101,7 @@ public class SteamVR_ControllerManager : MonoBehaviour
 			StopAllCoroutines();
 
 		var vr = SteamVR.instance;
-		if (vr.hmd.GetTrackedDeviceClass((uint)index) == TrackedDeviceClass.Controller)
+		if (vr.hmd.GetTrackedDeviceClass((uint)index) == ETrackedDeviceClass.Controller)
 		{
 			var connected = (bool)args[1];
 			if (connected)

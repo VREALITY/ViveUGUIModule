@@ -153,12 +153,6 @@ public class SteamVR_Menu : MonoBehaviour
 				}
 			}
 			GUILayout.EndHorizontal();
-
-			bool vsync = vr.compositor.GetVSync();
-			if (GUILayout.Toggle(vsync, "VSync") != vsync)
-			{
-				vr.compositor.SetVSync(!vsync);
-			}
 		}
 
 		overlay.highquality = GUILayout.Toggle(overlay.highquality, "High quality");
@@ -180,10 +174,10 @@ public class SteamVR_Menu : MonoBehaviour
 			tracker.wireframe = GUILayout.Toggle(tracker.wireframe, "Wireframe");
 
 			var render = SteamVR_Render.instance;
-			if (render.trackingSpace == Valve.VR.TrackingUniverseOrigin.TrackingUniverseSeated)
+			if (render.trackingSpace == Valve.VR.ETrackingUniverseOrigin.TrackingUniverseSeated)
 			{
 				if (GUILayout.Button("Switch to Standing"))
-					render.trackingSpace = Valve.VR.TrackingUniverseOrigin.TrackingUniverseStanding;
+					render.trackingSpace = Valve.VR.ETrackingUniverseOrigin.TrackingUniverseStanding;
 				if (GUILayout.Button("Center View"))
 				{
 					var vr = SteamVR.instance;
@@ -193,7 +187,7 @@ public class SteamVR_Menu : MonoBehaviour
 			else
 			{
 				if (GUILayout.Button("Switch to Seated"))
-					render.trackingSpace = Valve.VR.TrackingUniverseOrigin.TrackingUniverseSeated;
+					render.trackingSpace = Valve.VR.ETrackingUniverseOrigin.TrackingUniverseSeated;
 			}
 		}
 

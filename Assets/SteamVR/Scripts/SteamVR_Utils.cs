@@ -474,13 +474,13 @@ public static class SteamVR_Utils
 		}
 		else
 		{
-			var error = HmdError.None;
-			var pSystem = OpenVR.Init(ref error);
-			if (pSystem != System.IntPtr.Zero && error == HmdError.None)
+			var error = EVRInitError.None;
+			var pSystem = OpenVR.Init(ref error, EVRApplicationType.VRApplication_Other);
+			if (pSystem != System.IntPtr.Zero && error == EVRInitError.None)
 			{
 				// Make sure we're using the proper version
 				pSystem = OpenVR.GetGenericInterface(OpenVR.IVRSystem_Version, ref error);
-				if (pSystem != System.IntPtr.Zero && error == HmdError.None)
+				if (pSystem != System.IntPtr.Zero && error == EVRInitError.None)
 				{
 					var system = new CVRSystem(pSystem);
 					result = fn(system, args);
@@ -489,6 +489,15 @@ public static class SteamVR_Utils
 			}
 		}
 		return result;
+	}
+
+	public static void QueueEventOnRenderThread(int eventID)
+	{
+#if UNITY_5_0 || UNITY_5_1
+		GL.IssuePluginEvent(eventID);
+#else
+		GL.IssuePluginEvent(Unity.GetRenderEventFunc(), eventID);
+#endif
 	}
 }
 

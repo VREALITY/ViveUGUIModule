@@ -1,4 +1,4 @@
-SteamVR plugin for Unity - v1.0.3
+SteamVR plugin for Unity - v1.0.7
 Copyright 2014-2015, Valve Corporation, All rights reserved.
 
 
@@ -13,6 +13,74 @@ Requirements:
 The SteamVR runtime must be installed.  This can be found in Steam under Tools.
 
 The plugin currently only supports Windows / DX11.
+
+
+Changes for v1.0.7:
+
+* Updated to SteamVR runtime v1448479831.
+
+* Many enums updated to reflect latest SDK cleanup (v0.9.12).
+
+* Various fixes to support color space changes in the SDK.
+
+* Render models set the layer on their child components now to match their own.
+
+* Added a bool 'Load Additive' to SteamVR_LoadLevel script to optionally load the level additively, as well as an optional 'Post Load Settle Time'.
+
+* Fixed some issues with SteamVR_LoadLevel fading to a color with 'Show Grid' set to false.
+
+* Fixed an issue with orienting the loading screen in the SteamVR_LoadLevel script when using 'Loading Screen Distance'.
+
+
+Changes for v1.0.6:
+
+* Updated to SteamVR runtime v1446847085.
+
+* Added SteamVR_LevelLoad script to help smooth level transitions.
+
+* Added 'Take Snapshot' button to SteamVR_Skybox to automate creation of cubemap assets.
+
+* SteamVR_RenderModel now optionally creates subcomponents for buttons, etc. and optionally updates them dynamically to reflect pulling trigger, etc.
+
+* Added SteamVR_TestIK scene to Extras.
+
+* Added SteamVR.enabled which can be set to false to keep SteamVR.instance from initializing SteamVR.
+
+
+Changes for v1.0.5:
+
+* Updated to SteamVR runtime build #826021 (v.1445485596).
+
+* Removed TrackedDevices from [CameraRig] prefab (these were only ever meant to be in the example scene.
+
+* Added support for new native plugin interface.
+
+* Enabled MSAA in OpenGL as that appears to be fixed in the latest version of Unity.
+
+* Fix for upside-down rendering in OpenGL.
+
+* Moved calls to IVRCompositor::WaitGetPoses and Submit to Unity's render thread.
+
+* Couple fixes to prevent SteamVR from getting re-initialized when stopping the Editor preview.
+
+* Fix for hitches caused by SteamVR_PlayArea when not running SteamVR.
+
+
+Changes for v1.0.4:
+
+* Updated to SteamVR runtime build #768489 (v.1441831863).
+
+* Added SteamVR_Skybox for setting a cubemap in the compositor (useful for scene transitions).
+
+* Fix for RenderModels disappearing across scene transitions, and disabling use of modelOverride at runtime.
+
+* Added lockPhysicsUpdateRateToRenderFrequency to SteamVR_Render ([SteamVR] prefab) for apps that want to run their physics sim at a lower frequency.  Locked (true) by default.
+
+* Made per-eye culling masks easier to use.  (See http://steamcommunity.com/app/250820/discussions/0/535152276589455019/)
+
+* Exposed min/max curve distance settings for high quality overlay.  Note: High quality overlay not currently supported in Rift Direct Mode and falls back to normal (flat-only) overlay render path.
+
+* Added 'valid' property to SteamVR_Controller.  This is useful for detecting the controller is plugged in before tracking comes online.
 
 
 Changes for v1.0.3:
@@ -58,6 +126,8 @@ prefix "VREvent_" stripped off.
 * Simplified SteamVR_Camera Expand/Collapse functionality (now uses existing parent as origin if available).
 
 * Added SteamVR_PlayArea component to visualize different size spaces to target.
+
+* Exposed SteamVR_Overlay.curvedRange for the high-quality curved overlay render path.
 
 
 Changes for v1.0.2:
