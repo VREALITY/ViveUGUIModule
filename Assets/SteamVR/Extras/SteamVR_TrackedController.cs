@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using Valve.VR;
 
 public struct ClickedEventArgs
 {
@@ -13,7 +13,7 @@ public delegate void ClickedEventHandler(object sender, ClickedEventArgs e);
 public class SteamVR_TrackedController : MonoBehaviour
 {
     public uint controllerIndex;
-    public Valve.VR.VRControllerState_t controllerState;
+    public VRControllerState_t controllerState;
     public bool triggerPressed = false;
     public bool steamPressed = false;
     public bool menuPressed = false;
@@ -40,14 +40,27 @@ public class SteamVR_TrackedController : MonoBehaviour
         {
             gameObject.AddComponent<SteamVR_TrackedObject>();
         }
-        this.GetComponent<SteamVR_TrackedObject>().index = (SteamVR_TrackedObject.EIndex)controllerIndex;
-        if (this.GetComponent<SteamVR_RenderModel>() != null)
-        {
-            this.GetComponent<SteamVR_RenderModel>().index = (SteamVR_TrackedObject.EIndex)controllerIndex;
+
+		if (controllerIndex != 0)
+		{
+			this.GetComponent<SteamVR_TrackedObject>().index = (SteamVR_TrackedObject.EIndex)controllerIndex;
+			if (this.GetComponent<SteamVR_RenderModel>() != null)
+			{
+				this.GetComponent<SteamVR_RenderModel>().index = (SteamVR_TrackedObject.EIndex)controllerIndex;
+			}
+		}
+		else
+		{
+			controllerIndex = (uint) this.GetComponent<SteamVR_TrackedObject>().index;
         }
     }
 
-    public virtual void OnTriggerClicked(ClickedEventArgs e)
+	public void SetDeviceIndex(int index)
+	{
+			this.controllerIndex = (uint) index;
+	}
+
+	public virtual void OnTriggerClicked(ClickedEventArgs e)
     {
         if (TriggerClicked != null)
             TriggerClicked(this, e);
@@ -116,17 +129,18 @@ public class SteamVR_TrackedController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (SteamVR.instance.hmd.GetControllerState(controllerIndex, ref controllerState))
-        {
-            ulong trigger = controllerState.ulButtonPressed & (1UL << ((int)Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger));
+		var system = OpenVR.System;
+		if (system != null && system.GetControllerState(controllerIndex, ref controllerState))
+		{
+			ulong trigger = controllerState.ulButtonPressed & (1UL << ((int)EVRButtonId.k_EButton_SteamVR_Trigger));
             if (trigger > 0L && !triggerPressed)
             {
                 triggerPressed = true;
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnTriggerClicked(e);
 
             }
@@ -136,20 +150,20 @@ public class SteamVR_TrackedController : MonoBehaviour
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnTriggerUnclicked(e);
             }
 
-            ulong grip = controllerState.ulButtonPressed & (1UL << ((int)Valve.VR.EVRButtonId.k_EButton_Grip));
+            ulong grip = controllerState.ulButtonPressed & (1UL << ((int)EVRButtonId.k_EButton_Grip));
             if (grip > 0L && !gripped)
             {
                 gripped = true;
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnGripped(e);
 
             }
@@ -159,20 +173,20 @@ public class SteamVR_TrackedController : MonoBehaviour
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnUngripped(e);
             }
 
-            ulong pad = controllerState.ulButtonPressed & (1UL << ((int)Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad));
+            ulong pad = controllerState.ulButtonPressed & (1UL << ((int)EVRButtonId.k_EButton_SteamVR_Touchpad));
             if (pad > 0L && !padPressed)
             {
                 padPressed = true;
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnPadClicked(e);
             }
             else if (pad == 0L && padPressed)
@@ -181,20 +195,20 @@ public class SteamVR_TrackedController : MonoBehaviour
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnPadUnclicked(e);
             }
 
-            ulong menu = controllerState.ulButtonPressed & (1UL << ((int)Valve.VR.EVRButtonId.k_EButton_ApplicationMenu));
+            ulong menu = controllerState.ulButtonPressed & (1UL << ((int)EVRButtonId.k_EButton_ApplicationMenu));
             if (menu > 0L && !menuPressed)
             {
                 menuPressed = true;
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnMenuClicked(e);
             }
             else if (menu == 0L && menuPressed)
@@ -203,20 +217,20 @@ public class SteamVR_TrackedController : MonoBehaviour
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnMenuUnclicked(e);
             }
 
-            pad = controllerState.ulButtonTouched & (1UL << ((int)Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad));
+            pad = controllerState.ulButtonTouched & (1UL << ((int)EVRButtonId.k_EButton_SteamVR_Touchpad));
             if (pad > 0L && !padTouched)
             {
                 padTouched = true;
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int) Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int) Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnPadTouched(e);
 
             }
@@ -226,8 +240,8 @@ public class SteamVR_TrackedController : MonoBehaviour
                 ClickedEventArgs e;
                 e.controllerIndex = controllerIndex;
                 e.flags = (uint)controllerState.ulButtonPressed;
-                e.padX = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].x;
-                e.padY = controllerState.rAxis[(int)Valve.VR.EVRControllerAxisType.k_eControllerAxis_None].y;
+                e.padX = controllerState.rAxis0.x;
+                e.padY = controllerState.rAxis0.y;
                 OnPadUntouched(e);
             }
         }

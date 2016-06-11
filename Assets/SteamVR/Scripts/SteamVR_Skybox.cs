@@ -12,6 +12,14 @@ public class SteamVR_Skybox : MonoBehaviour
 	// Note: Unity's Left and Right Skybox shader variables are switched.
 	public Texture front, back, left, right, top, bottom;
 
+	public enum CellSize
+	{
+		x1024, x64, x32, x16, x8
+	}
+	public CellSize StereoCellSize = CellSize.x32;
+
+	public float StereoIpdMm = 64.0f;
+
 	public void SetTextureByIndex(int i, Texture t)
 	{
 		switch (i)
@@ -65,18 +73,18 @@ public class SteamVR_Skybox : MonoBehaviour
 		Texture top = null,
 		Texture bottom = null )
 	{
-		var vr = SteamVR.instance;
-		if (vr != null && vr.compositor != null)
+		var compositor = OpenVR.Compositor;
+		if (compositor != null)
 		{
 			var handles = new Texture[] { front, back, left, right, top, bottom };
 			var textures = new Texture_t[6];
 			for (int i = 0; i < 6; i++)
 			{
 				textures[i].handle = (handles[i] != null) ? handles[i].GetNativeTexturePtr() : System.IntPtr.Zero;
-				textures[i].eType = vr.graphicsAPI;
+				textures[i].eType = SteamVR.instance.graphicsAPI;
 				textures[i].eColorSpace = EColorSpace.Auto;
 			}
-			var error = vr.compositor.SetSkyboxOverride(textures);
+			var error = compositor.SetSkyboxOverride(textures);
 			if (error != EVRCompositorError.None)
 			{
 				Debug.LogError("Failed to set skybox override with error: " + error);
@@ -90,12 +98,9 @@ public class SteamVR_Skybox : MonoBehaviour
 
 	static public void ClearOverride()
 	{
-		if (SteamVR.active)
-		{
-			var vr = SteamVR.instance;
-			if (vr.compositor != null)
-				vr.compositor.ClearSkyboxOverride();
-		}
+		var compositor = OpenVR.Compositor;
+		if (compositor != null)
+			compositor.ClearSkyboxOverride();
 	}
 
 	void OnEnable()

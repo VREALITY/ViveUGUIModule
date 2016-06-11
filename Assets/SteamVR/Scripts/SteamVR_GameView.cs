@@ -9,6 +9,7 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class SteamVR_GameView : MonoBehaviour
 {
+#if (UNITY_5_3 || UNITY_5_2 || UNITY_5_1 || UNITY_5_0) // DEPRECATED in Unity 5.4+
 	public float scale = 1.5f;
 	public bool drawOverlay = true;
 
@@ -38,10 +39,10 @@ public class SteamVR_GameView : MonoBehaviour
 
 		GL.PushMatrix();
 		GL.LoadOrtho();
-#if UNITY_5_0
-		blitMaterial.SetPass(QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0);
-#else
+#if !(UNITY_5_0)
 		blitMaterial.SetPass(0);
+#else
+		blitMaterial.SetPass(QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0);
 #endif
 		GL.Begin(GL.QUADS);
 		GL.TexCoord2(0.0f, 0.0f); GL.Vertex3(x0, y0, 0);
@@ -64,10 +65,10 @@ public class SteamVR_GameView : MonoBehaviour
 
 			GL.PushMatrix();
 			GL.LoadOrtho();
-#if UNITY_5_0
-			overlayMaterial.SetPass(0);
-#else
+#if !(UNITY_5_0)
 			overlayMaterial.SetPass(QualitySettings.activeColorSpace == ColorSpace.Linear ? 1 : 0);
+#else
+			overlayMaterial.SetPass(0);
 #endif
 			GL.Begin(GL.QUADS);
 			GL.TexCoord2(u0, v0); GL.Vertex3(-1, -1, 0);
@@ -78,5 +79,6 @@ public class SteamVR_GameView : MonoBehaviour
 			GL.PopMatrix();
 		}
 	}
+#endif
 }
 
