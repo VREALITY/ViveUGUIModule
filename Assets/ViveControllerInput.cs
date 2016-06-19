@@ -51,7 +51,9 @@ public class ViveControllerInput : BaseInputModule
             ControllerCamera = new GameObject("Controller UI Camera").AddComponent<Camera>();
             ControllerCamera.clearFlags = CameraClearFlags.Nothing; //CameraClearFlags.Depth;
             ControllerCamera.cullingMask = 0; // 1 << LayerMask.NameToLayer("UI");
+#if UNITY_5_4_OR_NEWER
             ControllerCamera.stereoTargetEye = StereoTargetEyeMask.None;
+#endif
 
             ControllerManager = GameObject.FindObjectOfType<SteamVR_ControllerManager>();
             Controllers = new SteamVR_TrackedObject[] { ControllerManager.left.GetComponent<SteamVR_TrackedObject>(), ControllerManager.right.GetComponent<SteamVR_TrackedObject>() };
